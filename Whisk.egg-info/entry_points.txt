@@ -1,0 +1,3 @@
+[console_scripts]
+whisk = whisk.whisk:main
+
