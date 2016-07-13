@@ -17,8 +17,6 @@ setup(name = 'Whisk',
         'console_scripts': [
           'whisk = whisk.whisk:main',
         ]
-      },
-      package_data = {
-          # '': ['*.txt']
       }
+      # package_data = { '': ['*.txt'] }
 )
