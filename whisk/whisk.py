@@ -5,12 +5,13 @@ import os, sys, jinja2, subprocess, re, time, unidecode, datetime
 from codecs import open
 from xml.etree import ElementTree
 from textwrap import dedent
+from pkg_resources import resource_filename
 
 MARKDOWN_EXT = '.markdown'
 OUTPUT_EXT   = '.html'
 TEMPLATE_EXT = '.template'
 ROOT_DIR     = '.'
-TEMPLATE_DIR = '.'
+TEMPLATE_DIR = resource_filename("whisk.resources","")
 INDEX_NAME   = 'index'
 
 class Whisk:
@@ -53,6 +54,7 @@ class File(object):
         return self.__dict__
 
 
+# A class for markdown files, including YAML metadata.
 class MarkdownFile(File):
     # Markdown file class. Initialization converts the file to HTML.
     def __init__(self, fullpath):
@@ -78,6 +80,7 @@ class MarkdownFile(File):
             self.metadata[field] = value
 
 
+# Loads markdown files.
 class FileLoader:
     # Loads all files of a certain filetype. This class will become useful
     # when I want to do more processing on the markdown files: collecting and
@@ -104,6 +107,7 @@ class FileLoader:
                 file.add_data({'notes' : noteslist})
 
 
+# Does the templating work.
 class Templater:
     # Class for loading and rendering templates.
     def __init__(self, directory):
@@ -127,7 +131,7 @@ class Templater:
         with open(outfn, 'w+', encoding='utf_8_sig', errors='strict') as outf:
             outf.write(html)
 
-
+# Use multimarkdown.
 def multimarkdown(fullpath, args=''):
     args = ("multimarkdown %s %s" % (args, fullpath)).split()
     p = subprocess.Popen(args, stdout=subprocess.PIPE)
@@ -135,6 +139,7 @@ def multimarkdown(fullpath, args=''):
     output = p.stdout.read()
     return output.decode('utf_8').strip()
 
+# Multimarkdown from string.
 def multimarkdown_from_str(s):
     if not s:
         return ''
@@ -149,6 +154,7 @@ def multimarkdown_from_str(s):
     output = p2.communicate()[0]
     return output.encode('utf_8').strip()
 
+# Strips the outermost tag of a snippet of HTML.
 def inner_html(html):
     if not html:
         return ''
@@ -185,13 +191,16 @@ def create_new_note(arglist):
             raise Exception('Too many arguments')
 
         # Create title slug.
-        slug = slugify(title)
+        slugtitle = slugify(title)
 
         # Today's date, written as 2016-06-22.
-        date = datetime.datetime.now().strftime("%Y-%m-%d")
+        slugdate = datetime.datetime.now().strftime("%Y-%m-%d")
+
+        # Today's date, written as 2016-06-22.
+        nicedate = datetime.datetime.now().strftime("%A, %d %B %Y")
 
         # The filename.
-        filename = date + '-' + slug + '.markdown'
+        filename = slugdate + '-' + slugtitle + '.markdown'
 
         # Check to make sure the file doesn't already exist.
         # Whisk does not overwrite existing notes.
@@ -203,7 +212,7 @@ def create_new_note(arglist):
 author: 
 date:   {date}
 
-""".format(title=title, date=date)
+""".format(title=title, date=nicedate)
 
         # Create the file.
         file = open(filename, 'w+')
@@ -211,6 +220,29 @@ date:   {date}
         file.close()
 
         return filename
+
+
+# "Initiate" a whisk directory. Really, just create an index.markdown file.
+def whisk_init():
+    # Check to make sure the index file doesn't already exist.
+    # Whisk does not overwrite existing markdown files.
+    filename = 'index.markdown'
+    if os.path.isfile(filename):
+        raise Exception(filename + " already exists.")
+
+    # The contents of the index file to be created.
+    file_contents = """title:      Notes
+template:   index
+
+____
+"""
+
+    # Create the file.
+    file = open(filename, 'w+')
+    file.write(file_contents)
+    file.close()
+
+
 
 # Whisk away.
 def main():
@@ -220,8 +252,10 @@ def main():
     # be used.
     arglist = sys.argv[1:]
     if len(arglist) == 0:
-        raise Exception('usage:  whisk <command>\n' + \
-                        '        where <command> is in [new, make, view]')
+        print('usage:  whisk <command>\n' + \
+              '        where <command> is in [init, new, make, view]')
+
+        return
 
     command = arglist[0]
 
@@ -232,11 +266,18 @@ def main():
         # Open it to edit.
         os.system("open " + filename)
 
+    elif command == 'init' and len(arglist) == 1:
+        whisk_init()
+
     elif command == 'make' and len(arglist) == 1:
         w = Whisk()
 
     elif command == 'view' and len(arglist) == 1:
-        os.system("open index.html")
+        try:
+            os.system("open index.html")
+        except Exception:
+            raise Exception("The file index.html does not exist. " +
+                "Have you tried 'whisk init'?")
 
     else:
         print('whisk error: unknown command')

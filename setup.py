@@ -13,10 +13,16 @@ setup(name = 'Whisk',
       url = 'http://github.com/hrothgar/whisk',
       license = 'GPL v2',
       packages = find_packages(),
+      package_data={
+        '': [
+          '*.template',
+          '*.markdown',
+          '*.css'
+        ]
+      },
       entry_points = {
         'console_scripts': [
           'whisk = whisk.whisk:main',
         ]
       }
-      # package_data = { '': ['*.txt'] }
 )
