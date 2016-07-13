@@ -1,8 +1,0 @@
-setup.py
-Whisk.egg-info/PKG-INFO
-Whisk.egg-info/SOURCES.txt
-Whisk.egg-info/dependency_links.txt
-Whisk.egg-info/entry_points.txt
-Whisk.egg-info/top_level.txt
-whisk/__init__.py
-whisk/whisk.py
