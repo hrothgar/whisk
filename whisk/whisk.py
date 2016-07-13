@@ -1,7 +1,7 @@
 # This code depends on the command line tool multimarkdown.
 
 from __future__ import unicode_literals
-import os, sys, jinja2, subprocess, re, time
+import os, sys, jinja2, subprocess, re, time, unidecode, datetime
 from codecs import open
 from xml.etree import ElementTree
 from textwrap import dedent
@@ -166,23 +166,77 @@ def sort_alphanum(l, key, reverse=False):
                 map(int, re.split("(\\d+)", key(a).lower())[1::2])) )
 
 
+# A slugify function taken from
+#    http://stackoverflow.com/a/8366771
+def slugify(text):
+    text = unidecode.unidecode(text.decode('unicode-escape')).lower()
+    return re.sub(r'\W+', '-', text)
+
+
+# Create a new note.
+def create_new_note(arglist):
+
+        # Figure out what the title is.
+        if len(arglist) == 1:
+            title = input('Title of new note: ')
+        elif len(arglist) == 2:
+            title = arglist[1]
+        else:
+            raise Exception('Too many arguments')
+
+        # Create title slug.
+        slug = slugify(title)
+
+        # Today's date, written as 2016-06-22.
+        date = datetime.datetime.now().strftime("%Y-%m-%d")
+
+        # The filename.
+        filename = date + '-' + slug + '.markdown'
+
+        # Check to make sure the file doesn't already exist.
+        # Whisk does not overwrite existing notes.
+        if os.path.isfile(filename):
+            raise Exception(filename + " already exists.")
+
+        # The contents of the file to be created.
+        file_contents = """title:  {title}
+author: 
+date:   {date}
+
+""".format(title=title, date=date)
+
+        # Create the file.
+        file = open(filename, 'w+')
+        file.write(file_contents)
+        file.close()
+
+        return filename
+
 # Whisk away.
-if __name__ == "__main__":
+def main():
 
     # Very basic argument parsing, because there aren't many options here.
     # If/when the whisk arguments allow complexity, a real parser should
     # be used.
     arglist = sys.argv[1:]
+    if len(arglist) == 0:
+        raise Exception('usage:  whisk <command>\n' + \
+                        '        where <command> is in [new, make, view]')
+
     command = arglist[0]
 
     if command == 'new':
-        os.system("./whisk " + arglist.join(' '))
+        # Create the new note.
+        filename = create_new_note(arglist)
 
-    else if command == 'make' && len(arglist) == 1:
+        # Open it to edit.
+        os.system("open " + filename)
+
+    elif command == 'make' and len(arglist) == 1:
         w = Whisk()
 
-    else if command = 'view' && len(arglist) == 1:
-        os.system("./whisk view")
+    elif command == 'view' and len(arglist) == 1:
+        os.system("open index.html")
 
     else:
         print('whisk error: unknown command')
