@@ -1,0 +1,33 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <link rel='stylesheet' href='whisk.css' type='text/css' />
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      extensions: ["tex2jax.js"],
+      jax: ["input/TeX", "output/HTML-CSS"],
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+        displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+        processEscapes: true
+      },
+      "HTML-CSS": { availableFonts: ["TeX"] }
+    });
+  </script>
+  <script type="text/javascript"
+    src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+</head>
+<body>
+  <div id='wrapper'>
+    <header>
+      <h1>{{ metadata['title']|mmd|inline }}</h1>
+      <h2><span class='author'>{{ metadata['author']|mmd|inline }}</span><span class='middot'>&middot;</span><span class='date'>{{ metadata['date']|mmd|inline }}</span></h2>
+      <!-- <h4>{{ metadata['tags']|mmd|inline }}</h4> -->
+    </header>
+    <main>
+      {{ html }}
+    </main>
+  </div>
+</body>
+</html>
