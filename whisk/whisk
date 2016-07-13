@@ -1,11 +1,10 @@
 #!/bin/bash
 
 # USAGE:
-# $ whisk -n "Lorem ipsum."
+# $ whisk new "Lorem ipsum."
 # $ whisk make
 # $ whisk view
 
-WHISK_DIR="/Users/hrothgar/Desktop/whisk"
 
 #-- Ask the user what to name the thing
 #   if the user has not specified.
@@ -21,7 +20,7 @@ getName () {
 #-- Abort with a message
 abort_and_reopen () {
     echo "File $1 already exists."
-    subl -n "$1"
+    open -n "$1"
     exit 1
 }
 
@@ -35,33 +34,33 @@ trim() {
 
 case "$1" in
 #-- New note in current directory (no overwrite)
--n)
+new)
     TITLE=$(getName "$2")
     SLUG="$(echo -n ${TITLE} | sed -e 's/[^[:alnum:]]/-/g' \
                 | tr -s '-' | tr A-Z a-z)"
     SLUG=$(trim $SLUG)
     DATE=$(date +"%Y-%m-%d")
-    FILE="$WHISK_DIR/$DATE-$SLUG".markdown
+    FILE="$DATE-$SLUG".markdown
 
     # No overwrite.
     [[ -f $FILE ]] && $(abort_and_reopen "$FILE")
 
-    AUTHOR="Hrothgar"
+    AUTHOR=""
     DATE=$(date +"%a %d %b %Y")
     echo -e $"title:  $TITLE\nauthor: ${AUTHOR}\ndate:   $DATE\ntags:   \n" > $FILE
-    subl -n "$FILE"
+    open -n "$FILE"
     ;;
 
-# Whisk make.
-make)
-    pushd "$WHISK_DIR" > /dev/null
-    python "$WHISK_DIR/whisk.py"
-    popd > /dev/null
-    ;;
+# # Whisk make.
+# make)
+#     pushd "$WHISK_DIR" > /dev/null
+#     python "$WHISK_DIR/whisk.py"
+#     popd > /dev/null
+#     ;;
 
 #-- Whisk open.
 view)
-    open "$WHISK_DIR/index.html"
+    open "index.html"
     ;;
 
 esac

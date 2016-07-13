@@ -15,7 +15,7 @@ INDEX_NAME   = 'index'
 
 class Whisk:
     def __init__(self):
-        print('Preparing to make whisk...')
+        # print('Preparing to whisk...')
         start_time = time.time()
 
         # Load all markdown files.
@@ -168,4 +168,21 @@ def sort_alphanum(l, key, reverse=False):
 
 # Whisk away.
 if __name__ == "__main__":
-    w = Whisk()
+
+    # Very basic argument parsing, because there aren't many options here.
+    # If/when the whisk arguments allow complexity, a real parser should
+    # be used.
+    arglist = sys.argv[1:]
+    command = arglist[0]
+
+    if command == 'new':
+        os.system("./whisk " + arglist.join(' '))
+
+    else if command == 'make' && len(arglist) == 1:
+        w = Whisk()
+
+    else if command = 'view' && len(arglist) == 1:
+        os.system("./whisk view")
+
+    else:
+        print('whisk error: unknown command')
