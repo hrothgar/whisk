@@ -11,6 +11,11 @@ $ sudo python setup.py install
 ## Usage
 Create, build, and view documents using the `whisk` command.
 
+To create an index file (`index.markdown`), which is required to use the `whisk view` feature, type
+```
+$ whisk init
+```
+
 To create a new note called "My Note", type
 ```
 $ whisk new "My Note"
