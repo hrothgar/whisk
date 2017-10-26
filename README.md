@@ -32,4 +32,4 @@ $ whisk view
 ```
 
 ## Contact
-Contact the author at hrothgarrrr@gmail.com.
+Contact the author at h@rothos.com.
